@@ -1,0 +1,34 @@
+Workflow
+
+->Get Repo
+    git clone https://github.com/salujayatharth/uca_project.git
+
+->Setup project using README.md
+    *Steps to be taken in repo folder
+
+->Git Flow
+    ->git status -  shows current branch and file info
+    ->git branch - shows current branch and all branches
+    ->git checkout -b <branch_name> - to make new branch and change branch
+    ->git checkout <branch_name> - to change branch
+    ->git commit -m "<commit_info>" - commits to local repo
+        *write detailed commit messages
+    -> git push -u origin <branch_name> - push commited changes to branch
+    ->git pull - used to update repo
+        *always update repo before working to make sure u have the updated files
+    ->git merge <branch_name> - merges <branch_name> to current repo
+        *CAREFULL
+
+->Before Working
+->perform git pull before working
+->checkout new branch from master and commit in that branch
+
+->During work
+make sure to save changes(ie commit)
+
+->after work
+Check changes in your branch -- make sure they dont break anything
+merge changes to master(go to master branch = git checkout master
+                        git merge branchname
+                        git push origin -u master
+                        )
