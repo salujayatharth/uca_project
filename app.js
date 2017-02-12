@@ -6,8 +6,7 @@ app.use(bodyParser.json());
 app.use(express.static(__dirname + '/static'));
 
 app.get('/test', function(req, res){
-  console.log("In method test");
+  console.log("In method test " + process.argv[2]);
   res.end("hurray!! send_flowers is working")
 });
-
-var server = app.listen(8080)
+var server = app.listen(process.argv[2])
