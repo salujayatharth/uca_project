@@ -7,7 +7,9 @@
 	
 	c. $sudo apt-get install npm
 
-    d.$sudo apt-get install nginx
+	d. $sudo apt-get install mongodb
+
+    e.$sudo apt-get install nginx
 
 2. Install nodemon - $sudo npm install -g nodemon
 
