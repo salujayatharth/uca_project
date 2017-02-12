@@ -1,12 +1,19 @@
 var express = require('express');
-var app = express();
 var bodyParser = require('body-parser')
-app.use(bodyParser.json());
+var config = require('./config.json');
+var mongoose = require('mongoose')
+var utils = require('./utils')
+var app = express();
 
-app.use(express.static(__dirname + '/static'));
+app.use(bodyParser.json());
+app.use(express.static('static'));
+
+mongoose.connect(config.connectionString)
+var PORT = process.argv[2] || 9090
 
 app.get('/test', function(req, res){
-  console.log("In method test " + process.argv[2]);
-  res.end("hurray!! send_flowers is working")
+    utils.log(arguments[0].route)
+    res.end("hurray!! send_flowers is working")
+
 });
-var server = app.listen(process.argv[2])
+var server = app.listen(PORT)
