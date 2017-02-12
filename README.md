@@ -28,8 +28,8 @@ server localhost:8081;
 server localhost:8082;
 }
 server {
-listen 8080 default_server;
-listen [::]:8080 default_server;
+listen 80 default_server;
+listen [::]:80 default_server;
 root /var/www/html;
 # Add index.php to the list if you are using PHP
 index index.html index.htm index.nginx-debian.html;
@@ -46,7 +46,7 @@ server_name main;
 
 
 ------------------------------------------------------------
-5. run $sh ./run and open browser http://localhost:8080/test
+5. run $sh ./run and open browser http://localhost/test
 	*changes will be automatically reflected - server is autorestart
 
 
