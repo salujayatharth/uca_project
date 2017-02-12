@@ -1,2 +1,2 @@
 #!/bin/bash
-node app.js 8081 & node app.js 8082
+nodemon app.js 8081 & nodemon app.js 8082

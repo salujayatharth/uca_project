@@ -14,7 +14,38 @@
 3. run $npm install   - it will install required packages automatically (express and json body parser)
     OR try npm install --no-bin-links  if you get symlink error
 
-4. run $node app.js and open browser http://localhost:8080/test 
+4. setup load balancing -
+	Run following commands in your system
+	$sudo apt-get install nginx
+	$sudo cp /etc/nginx/sites-available/default cp /etc/nginx/sites-available/default_backup
+	replace the contents of /etc/nginx/sites-available/default with this ->
+
+
+upstream backend {
+server localhost:8081;
+server localhost:8082;
+}
+server {
+listen 8080 default_server;
+listen [::]:8080 default_server;
+root /var/www/html;
+# Add index.php to the list if you are using PHP
+index index.html index.htm index.nginx-debian.html;
+
+server_name main;
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		#try_files $uri $uri/ =404;
+		proxy_pass http://backend;
+	}
+}
+
+
+------------------------------------------------------------
+5. run $sh ./run and open browser http://localhost:8080/test
+	*changes will be automatically reflected - server is autorestart
 
 
 #Benchmarking a web service
