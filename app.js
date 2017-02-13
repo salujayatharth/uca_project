@@ -7,10 +7,11 @@ var utils = require('./utils')
 var cookieParser = require('cookie-parser')
 var passport = require('passport');
 var strategy = require('passport-google-oauth20').Strategy;
-
-var app = express();
-var PORT = process.argv[2] || 9090
 mongoose.connect(config.connectionString);
+
+var user = require('./models/User');
+var app = express();
+var PORT = process.argv[2] || 9090;
 
 passport.use(new strategy({
     clientID: process.env.CLIENT_ID,
@@ -18,21 +19,18 @@ passport.use(new strategy({
     callbackURL: 'http://localhost/callback'
   },
   function(accessToken, refreshToken, profile, cb) {
-    if (profile) {
-    user = profile;
-    return cb(null, user);
-    }
-    else {
-    return cb(null, false);
-    }
+    user.store(profile.id, profile.displayName)
+    return cb(null,profile || false)
   }
 ));
 
 passport.serializeUser(function(user, cb) {
-  cb(null, user);
+    console.log('serializing user');
+  cb(null, user.id);
 });
 
 passport.deserializeUser(function(obj, cb) {
+    console.log('deserializing user');
   cb(null, obj);
 });
 
@@ -48,7 +46,22 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-app.get('/authenticate', passport.authenticate('google', { scope: ['profile'] }));
+app.get(
+  // Login url
+  '/authenticate',
+
+  // Save the url of the user's current page so the app can redirect back to
+  // it after authorization
+  (req, res, next) => {
+    if (req.query.return) {
+      req.session.oauth2return = req.query.return;
+    }
+    next();
+  },
+
+  // Start OAuth 2 flow using Passport.js
+  passport.authenticate('google', { scope: ['email', 'profile'] })
+);
 
 app.get('/login',  function(req, res){
     utils.log(arguments[0].route)
@@ -56,17 +69,14 @@ app.get('/login',  function(req, res){
 
 });
 
-app.get('/callback', 
-  passport.authenticate('google', { failureRedirect: '/authenticate' }),
-  function(req, res) {
-    utils.log(arguments[0].route)
-    // Successful authentication, redirect home.
-    res.redirect('/');
-  });
+app.get('/callback', passport.authenticate('google',  
+    { successRedirect: '/', failureRedirect: '/login' }
+));
+
 
 app.get('/', function(req, res){
     utils.log(arguments[0].route)
-    res.end("hurray!! send_flowers is working with authentication for ")
+    res.end("" + req)
 
 });
 
