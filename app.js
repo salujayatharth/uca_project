@@ -1,4 +1,5 @@
 require('dotenv').config();
+var morgan = require('morgan');
 var express = require('express');
 var bodyParser = require('body-parser')
 var config = require('./config.json');
@@ -34,10 +35,10 @@ passport.deserializeUser(function(obj, cb) {
   cb(null, obj);
 });
 
-
-app.use(bodyParser.json());
-app.use(cookieParser());
+app.use(morgan(':date[clf] :method :url :status :response-time'))
 app.use(express.static('static'));
+app.use(cookieParser());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
 // Initialize Passport and restore authentication state, if any, from the
@@ -64,7 +65,6 @@ app.get(
 );
 
 app.get('/login',  function(req, res){
-    utils.log(arguments[0].route)
     res.end("<a href = /authenticate>Click here!</>")
 
 });
@@ -75,14 +75,12 @@ app.get('/callback', passport.authenticate('google',
 
 
 app.get('/', function(req, res){
-    utils.log(arguments[0].route)
-    res.end("" + req)
+    res.end("" + req.user)
 
 });
 
 
 app.get('/test', function(req, res){
-    utils.log(arguments[0].route)
     res.end("hurray!! send_flowers is working")
 
 });
