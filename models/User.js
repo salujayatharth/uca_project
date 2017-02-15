@@ -9,14 +9,20 @@ var userSchema = mongoose.Schema({
     name:{
         type: String,
         required: true
+    },
+    email:{
+        type: String,
+        unique: true,
+        required: true
     }
 })
 
-var User = mongoose.model('user', userSchema);
+var User = module.exports = mongoose.model('logins', userSchema);
 
-module.exports = {
-    store: function(id,name){
-        console.log("Adding User : " + id +"-"+ name)
-        User.create(new User({id:id,name:name}))
+module.exports.store = function(id,name,mail){
+        console.log("Adding User : " + mail)
+        User.create(new User({id:id,
+                            name:name,
+                            email:mail
+                        }))
     }
-}
