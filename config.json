@@ -1,3 +1,4 @@
 {
-    "connectionString": "mongodb://localhost:27017/master"
+    "connectionString": "mongodb://localhost:27017/master",
+    "port": 8080
 }

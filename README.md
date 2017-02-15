@@ -24,8 +24,8 @@
 
 
 upstream backend {
-server localhost:8081;
-server localhost:8082;
+server localhost:8080;
+#server localhost:8081;
 }
 server {
 listen 80 default_server;
@@ -46,8 +46,8 @@ server_name main;
 
 
 ------------------------------------------------------------
-5. run $sh ./run and open browser http://localhost/test
-	*changes will be automatically reflected - server is autorestart
+5. run $nodemon app.js and open browser http://localhost/test
+	*changes will be automatically reflected - server will autorestart
 
 
 #Benchmarking a web service

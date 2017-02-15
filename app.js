@@ -1,88 +1,110 @@
+//get secret environment variables
 require('dotenv').config();
+
+//logger
 var morgan = require('morgan');
-var express = require('express');
-var bodyParser = require('body-parser')
+
+//configuration file
 var config = require('./config.json');
+
+var express = require('express');
+var expressSession = require('express-session');
+var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
+
+//basic utilities
 var utils = require('./utils')
 var cookieParser = require('cookie-parser')
+
+//Authetication helper
 var passport = require('passport');
-var strategy = require('passport-google-oauth20').Strategy;
+var strategy = require('passport-google-oauth').OAuth2Strategy;
+
+//db connection
 mongoose.connect(config.connectionString);
+//db model
+var User = require('./models/User');
 
-var user = require('./models/User');
 var app = express();
-var PORT = process.argv[2] || 9090;
+var PORT = config.port;
 
+//setting upn authentication statergy
 passport.use(new strategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: 'http://localhost/callback'
   },
-  function(accessToken, refreshToken, profile, cb) {
-    user.store(profile.id, profile.displayName)
-    return cb(null,profile || false)
+  function(accessToken, refreshToken, profile, done) {
+    //Storing profile
+    User.store(profile.id,profile.displayName,profile.emails[0].value)
+    return done(null,profile);
   }
 ));
 
+
 passport.serializeUser(function(user, cb) {
-    console.log('serializing user');
-  cb(null, user.id);
+    console.log('serializing user, ' + user.id);
+  cb(null, user);
 });
 
-passport.deserializeUser(function(obj, cb) {
-    console.log('deserializing user');
-  cb(null, obj);
-});
+passport.deserializeUser(function(user, done) {
+  console.log('deserializing user ' + user);
+  done(null, user);
+})
 
-app.use(morgan(':date[clf] :method :url :status :response-time'))
+//setting up app configuration
+//DO NOT CHANGE ORDER
+app.use(morgan(':date[clf] :status :method :url :response-time'))
+app.use(cookieParser(process.env.cookieSecret));
 app.use(express.static('static'));
-app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+app.use(expressSession({ secret: process.env.cookieSecret, resave: true, saveUninitialized: true,
+                        cookie:{secure: false, maxAge: null}}));
 
 // Initialize Passport and restore authentication state, if any, from the
 // session.
 app.use(passport.initialize());
 app.use(passport.session());
 
+//authentication call
+app.get('/authenticate',
+  passport.authenticate('google', { scope: ['email','profile'] }));
 
-app.get(
-  // Login url
-  '/authenticate',
+//callback method
+app.get('/callback',
+  passport.authenticate('google', {successRedirect:'/', failureRedirect: '/login'}));
 
-  // Save the url of the user's current page so the app can redirect back to
-  // it after authorization
-  (req, res, next) => {
-    if (req.query.return) {
-      req.session.oauth2return = req.query.return;
-    }
-    next();
-  },
 
-  // Start OAuth 2 flow using Passport.js
-  passport.authenticate('google', { scope: ['email', 'profile'] })
-);
+//TO be used
+function isLoggedIn(req, res, next) {
 
-app.get('/login',  function(req, res){
-    res.end("<a href = /authenticate>Click here!</>")
+    // if user is authenticated in the session, carry on 
+    if (req.isAuthenticated())
+        return next();
 
+    // if they aren't redirect them to the home page
+    res.redirect('/login');
+}
+
+
+//authorization redirects here
+app.get('/', function(req,res){
+  if(req.user){
+    console.log(req.user.displayName);
+    res.end("Eureka!! " + req.user.dislplayName);
+}
+else
+{
+  res.end("EUREKA!!");
+}
 });
 
-app.get('/callback', passport.authenticate('google',  
-    { successRedirect: '/', failureRedirect: '/login' }
-));
 
-
-app.get('/', function(req, res){
-    res.end("" + req.user)
-
-});
-
-
+//testing Function
 app.get('/test', function(req, res){
-    res.end("hurray!! send_flowers is working")
+    res.end("hurray!! send_flowers is working");
 
 });
 
+//start the app
 var server = app.listen(PORT)
