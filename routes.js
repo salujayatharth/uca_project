@@ -36,7 +36,6 @@ router.get('/logout', function(req, res){
     res.redirect('/test');
 });
 
-
 //testing Function
 router.get('/ping', function(req, res){
     res.status(200).send("pong!");

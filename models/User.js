@@ -1,11 +1,6 @@
 var mongoose = require('mongoose');
+var Cart = require('./Cart');
 var userSchema = mongoose.Schema({
-    id:{
-        type: Number,
-        unique: true,
-        required: true
-    },
-
     name:{
         type: String,
         required: true
@@ -23,25 +18,32 @@ var userSchema = mongoose.Schema({
         {
             type: Number,
             required: false
-        }
+        },
+    address:
+        [{
+            type: String
+        }]
+
 })
 
 var User = module.exports = mongoose.model('logins', userSchema);
 
-module.exports.addUserToDb = function(data){
+User.addToDb = function(data){
     console.log("inserting into db: " + data.email)
         User.create(data, function(err, row){
         if(err || !row){
             console.log("Could not insert")
         }
         else{
-            // cart.add(row.id)
+            Cart.init(row._id,function(res){
+                console.log(res)
+            })
         }
     })
 
 }
 
-module.exports.addPhoneToUser = function(mail,phone){
+User.addPhone = function(mail,phone){
         query = {email:mail}
         update = {phone:phone}
         User.findOneAndUpdate(query,update,function(err,resp){
@@ -55,11 +57,37 @@ module.exports.addPhoneToUser = function(mail,phone){
         })
 }
 
-module.exports.getDataByMail = function(mail,cb){
+User.addAddress = function(mail,address){
+        query = {email:mail}
+        update = {address:address}
+        User.findOneAndUpdate(query,{$push:update},function(err,resp){
+            if(err || !resp){
+                console.log("Did not update: " + err)
+        }
+            else
+            {
+                console.log("added address")
+            }
+        })
+}
+User.removeAllAddress = function(mail){
+        query = {email:mail}
+        User.findOneAndUpdate(query,{address:[]},function(err,resp){
+            if(err || !resp){
+                console.log("Did not update: " + err)
+        }
+            else
+            {
+                console.log("added address")
+            }
+        })
+}
+
+User.getDataByMail = function(mail,cb){
     User.findOne({'email':mail},function(err, result){
         if(err || !result){
             console.log("User not found")
-            cb(false)
+            cb({})
         }
         else
         {

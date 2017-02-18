@@ -9,6 +9,7 @@ var config = require('./config.json');
 
 //routes for the app
 var routes = require('./routes')
+var cartRoutes = require('./carts_route')
 
 var express = require('express');
 var expressSession = require('express-session');
@@ -74,5 +75,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/',routes)
+app.use('/cart',cartRoutes)
 //start the app
 var server = app.listen(PORT)
