@@ -1,2 +1,0 @@
-#!/bin/bash
-nodemon app.js 8081 & nodemon app.js 8082

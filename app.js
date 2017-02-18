@@ -7,14 +7,18 @@ var morgan = require('morgan');
 //configuration file
 var config = require('./config.json');
 
+//routes for the app
+var routes = require('./routes')
+
 var express = require('express');
 var expressSession = require('express-session');
+var MongoStore = require('connect-mongo')(expressSession);
+var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
 
 //basic utilities
 var utils = require('./utils')
-var cookieParser = require('cookie-parser')
 
 //Authetication helper
 var passport = require('passport');
@@ -36,19 +40,20 @@ passport.use(new strategy({
   },
   function(accessToken, refreshToken, profile, done) {
     //Storing profile
-    User.store(profile.id,profile.displayName,profile.emails[0].value)
-    return done(null,profile);
+    data = {id:profile.id,name:profile.displayName,email:profile.emails[0].value,photo:profile.photos[0].value}
+    User.addUserToDb(data)
+    return done(null,data);
   }
 ));
 
 
 passport.serializeUser(function(user, cb) {
-    console.log('serializing user, ' + user.id);
+  console.log('serializing user: ' + user.email);
   cb(null, user);
 });
 
 passport.deserializeUser(function(user, done) {
-  console.log('deserializing user ' + user);
+  console.log('deserializing user');
   done(null, user);
 })
 
@@ -58,53 +63,16 @@ app.use(morgan(':date[clf] :status :method :url :response-time'))
 app.use(cookieParser(process.env.cookieSecret));
 app.use(express.static('static'));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(expressSession({ secret: process.env.cookieSecret, resave: true, saveUninitialized: true,
-                        cookie:{secure: false, maxAge: null}}));
+app.use(expressSession({ secret: process.env.cookieSecret,
+                      resave: true, saveUninitialized: true,
+                      store: new MongoStore({ mongooseConnection: mongoose.connection }),
+                      cookie:{secure: false, maxAge: 604800000}}));
 
 // Initialize Passport and restore authentication state, if any, from the
 // session.
 app.use(passport.initialize());
 app.use(passport.session());
 
-//authentication call
-app.get('/authenticate',
-  passport.authenticate('google', { scope: ['email','profile'] }));
-
-//callback method
-app.get('/callback',
-  passport.authenticate('google', {successRedirect:'/', failureRedirect: '/login'}));
-
-
-//TO be used
-function isLoggedIn(req, res, next) {
-
-    // if user is authenticated in the session, carry on 
-    if (req.isAuthenticated())
-        return next();
-
-    // if they aren't redirect them to the home page
-    res.redirect('/login');
-}
-
-
-//authorization redirects here
-app.get('/', function(req,res){
-  if(req.user){
-    console.log(req.user.displayName);
-    res.end("Eureka!! " + req.user.dislplayName);
-}
-else
-{
-  res.end("EUREKA!!");
-}
-});
-
-
-//testing Function
-app.get('/test', function(req, res){
-    res.end("hurray!! send_flowers is working");
-
-});
-
+app.use('/',routes)
 //start the app
 var server = app.listen(PORT)

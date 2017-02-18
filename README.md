@@ -19,7 +19,7 @@
 4. setup load balancing -
 	Run following commands in your system
 	$sudo apt-get install nginx
-	$sudo cp /etc/nginx/sites-available/default cp /etc/nginx/sites-available/default_backup
+	$sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default_backup
 	replace the contents of /etc/nginx/sites-available/default with this ->
 
 
