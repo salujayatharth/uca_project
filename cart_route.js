@@ -8,7 +8,7 @@ router.use(utils.isLoggedIn, function(req,res,next) {
   next();
 })
 
-//get all items
+//get all items in cart
 router.get('/', function(req, res){
   User.getDataByMail(req.user.email,function(result){
     Cart.getItems(result._id,function(result){

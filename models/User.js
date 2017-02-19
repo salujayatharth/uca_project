@@ -28,7 +28,7 @@ var userSchema = mongoose.Schema({
 
 var User = module.exports = mongoose.model('logins', userSchema);
 
-User.addToDb = function(data,cb){
+User.addToDb = function(data){
     console.log("inserting into db: " + data.email)
         User.create(data, function(err, row){
         if(err || !row){
@@ -38,7 +38,6 @@ User.addToDb = function(data,cb){
         else{
             Cart.init(row._id,function(res){
                 console.log(res)
-                cb(row._id)
             })
         }
     })
@@ -98,6 +97,7 @@ User.removeAllAddress = function(mail,cb){
     })
 }
 
+//returns all info
 User.getDataByMail = function(mail,cb){
     User.findOne({'email':mail},function(err, result){
         if(err || !result){

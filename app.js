@@ -80,12 +80,15 @@ app.use(passport.session());
 
 //callback method for Oauth
 app.get('/callback',
-  passport.authenticate('google', {successRedirect:'/user', failureRedirect: '/'}));
+  passport.authenticate('google', {successRedirect:'/user', failureRedirect: '/ping'}));
 
 //authentication call
 app.get('/authenticate',
   passport.authenticate('google', { scope: ['email','profile'] }));
 
+app.get('/ping',function(req,res){
+  res.send("pong!!")
+})
 
 app.use('/user',userRoutes)
 app.use('/cart',cartRoutes)

@@ -66,6 +66,7 @@ Cart.addItem = function(id,item_id,count,cb){
     })
 }
 
+//sets item count in cart
 Cart.setItem = function(id,item_id,count,cb) {
     if(!id || !item_id || !count)
         {return cb({})}

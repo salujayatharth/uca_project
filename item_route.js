@@ -10,7 +10,7 @@ router.use(utils.isLoggedIn, function(req,res,next) {
   next();
 })
 
-//authorization redirects here
+//displays all items
 router.get('/', function(req,res,next){
   Item.getAll(function(result){
     res.json(result)
