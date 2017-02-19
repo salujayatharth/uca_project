@@ -8,10 +8,12 @@ var morgan = require('morgan');
 var config = require('./config.json');
 
 //routes for the app
-var routes = require('./routes')
-var cartRoutes = require('./carts_route')
+var userRoutes = require('./user_route')
+var cartRoutes = require('./cart_route')
+var itemRoutes = require('./item_route')
 
 var express = require('express');
+var fileUpload = require('express-fileupload');
 var expressSession = require('express-session');
 var MongoStore = require('connect-mongo')(expressSession);
 var cookieParser = require('cookie-parser')
@@ -38,11 +40,11 @@ passport.use(new strategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
     callbackURL: 'http://localhost/callback'
-  },
+    },
   function(accessToken, refreshToken, profile, done) {
     //Storing profile
     data = {id:profile.id,name:profile.displayName,email:profile.emails[0].value,photo:profile.photos[0].value}
-    User.addUserToDb(data)
+    User.addToDb(data)
     return done(null,data);
   }
 ));
@@ -62,7 +64,9 @@ passport.deserializeUser(function(user, done) {
 //DO NOT CHANGE ORDER
 app.use(morgan(':date[clf] :status :method :url :response-time'))
 app.use(cookieParser(process.env.cookieSecret));
+app.use(fileUpload());
 app.use(express.static('static'));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressSession({ secret: process.env.cookieSecret,
                       resave: true, saveUninitialized: true,
@@ -74,7 +78,17 @@ app.use(expressSession({ secret: process.env.cookieSecret,
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/',routes)
+//callback method for Oauth
+app.get('/callback',
+  passport.authenticate('google', {successRedirect:'/user', failureRedirect: '/'}));
+
+//authentication call
+app.get('/authenticate',
+  passport.authenticate('google', { scope: ['email','profile'] }));
+
+
+app.use('/user',userRoutes)
 app.use('/cart',cartRoutes)
+app.use('/item',itemRoutes)
 //start the app
 var server = app.listen(PORT)

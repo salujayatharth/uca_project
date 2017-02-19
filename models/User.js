@@ -28,59 +28,74 @@ var userSchema = mongoose.Schema({
 
 var User = module.exports = mongoose.model('logins', userSchema);
 
-User.addToDb = function(data){
+User.addToDb = function(data,cb){
     console.log("inserting into db: " + data.email)
         User.create(data, function(err, row){
         if(err || !row){
             console.log("Could not insert")
+
         }
         else{
             Cart.init(row._id,function(res){
                 console.log(res)
+                cb(row._id)
             })
         }
     })
 
 }
 
-User.addPhone = function(mail,phone){
-        query = {email:mail}
-        update = {phone:phone}
-        User.findOneAndUpdate(query,update,function(err,resp){
-            if(err || !resp){
-                console.log("Did not update")
+User.addPhone = function(mail,phone,cb){
+    if(!mail || !phone)
+        {return cb({})}
+    query = {email:mail}
+    update = {phone:phone}
+    User.findOneAndUpdate(query,update,function(err,resp){
+        if(err || !resp){
+            console.log("Did not update")
+            cb({})
         }
-            else
-            {
-                console.log("added number")
-            }
-        })
+        else
+        {
+            console.log("added number")
+            cb(phone)
+        }
+    })
 }
 
-User.addAddress = function(mail,address){
-        query = {email:mail}
-        update = {address:address}
-        User.findOneAndUpdate(query,{$push:update},function(err,resp){
-            if(err || !resp){
-                console.log("Did not update: " + err)
+User.addAddress = function(mail,address,cb){
+    if(!mail || !address)
+        {return cb({})}
+    query = {email:mail}
+    update = {address:address}
+    console.log(query)
+    console.log(update)
+
+    User.findOneAndUpdate(query,{$push:update},function(err,resp){
+        if(err || !resp){
+            console.log("Did not update: " + err)
+            cb({})
         }
-            else
-            {
-                console.log("added address")
-            }
-        })
+        else
+        {
+            console.log("added address")
+            cb(address)
+        }
+    })
 }
-User.removeAllAddress = function(mail){
-        query = {email:mail}
-        User.findOneAndUpdate(query,{address:[]},function(err,resp){
-            if(err || !resp){
-                console.log("Did not update: " + err)
+User.removeAllAddress = function(mail,cb){
+    query = {email:mail}
+    User.findOneAndUpdate(query,{address:[]},function(err,resp){
+        if(err || !resp){
+            console.log("Did not update: " + err)
+            cb(false)
         }
-            else
-            {
-                console.log("added address")
-            }
-        })
+        else
+        {
+            console.log("added address")
+            cb(true)
+        }
+    })
 }
 
 User.getDataByMail = function(mail,cb){

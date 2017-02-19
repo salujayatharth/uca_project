@@ -9,7 +9,8 @@ var cartSchema = mongoose.Schema({
     items:{    
         type: [{
             _id: {   
-                type: mongoose.Schema.ObjectId
+                type: mongoose.Schema.ObjectId,
+                ref: 'items'
                 },
             count: {
                 type: Number,
@@ -41,7 +42,9 @@ Cart.init = function(id,cb){
 Cart.addItem = function(id,item_id,count,cb){
     if(!count)
         {count = 1}
-    Cart.findOne({"_id":id,"items":{"$elemMatch":{"_id": item_id}}},function (err,res) {
+    if(!id || !item_id || !count)
+        {return cb({})}
+    Cart.findOne({"_id":id,"items._id":item_id},function (err,res) {
         if(err || !res)
             {
             console.log("Adding new item to cart")
@@ -53,7 +56,7 @@ Cart.addItem = function(id,item_id,count,cb){
         else
             {
             console.log("Updating item count in cart")
-            Cart.findOneAndUpdate({"_id":id,"items":{"$elemMatch":{"_id": item_id}}},
+            Cart.findOneAndUpdate({"_id":id,"items._id": item_id},
                                     {"$inc": {"items.$.count":count}},
                 function(err,res){
                     cb(res)
@@ -64,19 +67,21 @@ Cart.addItem = function(id,item_id,count,cb){
 }
 
 Cart.setItem = function(id,item_id,count,cb) {
-    Cart.findOneAndUpdate({"_id":id,"items":{"$elemMatch":{"_id": item_id}}},
+    if(!id || !item_id || !count)
+        {return cb({})}
+    Cart.findOneAndUpdate({"_id":id,"items._id": item_id},
                                     {"items.$.count":count},
-                function(err,res){
-                    console.log(res)
-                    cb(res)
-                }
-            )   
+        function(err,res){
+            console.log(res)
+            cb(res)
+        }
+    )   
 }
 
 //Returns all items
 Cart.getItems = function(id,cb){
-    Cart.findById(id, 'items', function(err,result){
-        cb(result.items)
+    Cart.findById(id, function(err,result){
+        cb(result)
     })
 }
 
