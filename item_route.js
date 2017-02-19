@@ -6,7 +6,7 @@ var User = require('./models/User');
 var Item = require('./models/Items');
 var storage = require('./config.json').photoStore;
 
-router.use(utils.isLoggedIn, function(req,res,next) {
+router.use(function(req,res,next) {
   next();
 })
 
@@ -30,7 +30,7 @@ router.get('/uploader', function(req,res,next){
   res.send('<form action="/item/make" encType="multipart/form-data" method=post><input name="name" type=text><input name="price" type=number><input name="count" type=number><input name="photo" type="file" /><input type=submit></form>')
   });
 
-router.get('/addReview', function(req, res){
+router.get('/addReview',utils.isLoggedIn,  function(req, res){
   Item.addReview(req.query.id,req.query.review,function(result){
     res.json(result);
   })
@@ -42,7 +42,7 @@ router.get('/getReview', function(req, res){
   })
 });
 
-router.get('/addRating', function(req, res){
+router.get('/addRating',utils.isLoggedIn, function(req, res){
   Item.addRating(req.query.id,req.query.rating,function(result){
     res.json(result);
   })
