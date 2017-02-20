@@ -1,4 +1,8 @@
+<a href="https://codeclimate.com/github/salujayatharth/uca_project"><img src="https://codeclimate.com/github/salujayatharth/uca_project/badges/gpa.svg" /></a>
+
 # uca_project
+
+
 1. Install Node
 
 	a. $sudo apt-get install nodejs
