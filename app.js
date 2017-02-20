@@ -58,7 +58,7 @@ passport.use('local-login', new localStrategy({
   callbackURL: 'http://localhost/vendor/callback'
 },
   function(username, password, done) {
-    Vendor.findOne({ name: username }, function (err, user) {
+    Vendor.findOne({ username: username }, function (err, user) {
       if (err) { return done(err); }
       if (!user) { 
         console.log("user not found")
@@ -84,7 +84,7 @@ passport.use('local-signup', new localStrategy({
 
         process.nextTick(function() {
 
-            Vendor.findOne({ 'name' : username}, function(err, user) {
+            Vendor.findOne({ 'username' : username}, function(err, user) {
                 if (err)
                     return done(err);
 
@@ -93,6 +93,8 @@ passport.use('local-signup', new localStrategy({
                 }
 
                 else {
+                  //TO BE DONE
+                  //use req.body to load other variables
                     Vendor.addToDb(username,password,function(err,result) {
                       if(err)
                         throw err;
@@ -106,7 +108,7 @@ passport.use('local-signup', new localStrategy({
 
 
 passport.serializeUser(function(user, cb) {
-  console.log('serializing user: ' + user.email);
+  console.log('serializing user: ' + user.name);
   cb(null, user);
 });
 
@@ -135,11 +137,13 @@ app.use(passport.session());
 
 //callback method for Oauth
 app.get('/callback',
-  passport.authenticate('google', {successRedirect:'/user', failureRedirect: '/ping'}));
+  passport.authenticate('google', {successRedirect:'/user', failureRedirect: '/ping'})
+);
 
 //authentication call
 app.get('/authenticate',
-  passport.authenticate('google', { scope: ['email','profile'] }));
+  passport.authenticate('google', { scope: ['email','profile'] })
+);
 
 app.get('/ping',function(req,res){
   res.send("pong!!")

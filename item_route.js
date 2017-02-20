@@ -16,19 +16,6 @@ router.get('/', function(req,res,next){
     res.json(result)
   })
 });
-// //Cart Functions
-router.post('/make', function(req, res){
-  User.getDataByMail(req.user.email,function(result){
-    Item.init(req.body.name,req.body.price,req.body.count,req.files.photo,function(result){
-      res.json(result);
-    });
-  })
-}); 
-
-// sample uploader
-router.get('/uploader', function(req,res,next){
-  res.send('<form action="/item/make" encType="multipart/form-data" method=post><input name="name" type=text><input name="price" type=number><input name="count" type=number><input name="photo" type="file" /><input type=submit></form>')
-  });
 
 router.get('/addReview',utils.isLoggedIn,  function(req, res){
   Item.addReview(req.query.id,req.query.review,function(result){

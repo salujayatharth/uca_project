@@ -17,7 +17,6 @@ var userSchema = mongoose.Schema({
     phone:
         {
             type: Number,
-            required: false
         },
     address:
         [{
@@ -46,13 +45,13 @@ User.addToDb = function(data){
 
 User.addPhone = function(mail,phone,cb){
     if(!mail || !phone)
-        {return cb({})}
+        {return cb(false)}
     query = {email:mail}
     update = {phone:phone}
     User.findOneAndUpdate(query,update,function(err,resp){
-        if(err || !resp){
+        if(err){
             console.log("Did not update")
-            cb({})
+            cb(false)
         }
         else
         {
@@ -64,16 +63,16 @@ User.addPhone = function(mail,phone,cb){
 
 User.addAddress = function(mail,address,cb){
     if(!mail || !address)
-        {return cb({})}
+        {return cb(false)}
     query = {email:mail}
     update = {address:address}
     console.log(query)
     console.log(update)
 
     User.findOneAndUpdate(query,{$push:update},function(err,resp){
-        if(err || !resp){
-            console.log("Did not update: " + err)
-            cb({})
+        if(err){
+            console.log("Did not update:\n" + err)
+            cb(false)
         }
         else
         {
@@ -82,11 +81,12 @@ User.addAddress = function(mail,address,cb){
         }
     })
 }
+
 User.removeAllAddress = function(mail,cb){
     query = {email:mail}
     User.findOneAndUpdate(query,{address:[]},function(err,resp){
-        if(err || !resp){
-            console.log("Did not update: " + err)
+        if(err){
+            console.log("Did not update:\n" + err)
             cb(false)
         }
         else
@@ -100,9 +100,9 @@ User.removeAllAddress = function(mail,cb){
 //returns all info
 User.getDataByMail = function(mail,cb){
     User.findOne({'email':mail},function(err, result){
-        if(err || !result){
-            console.log("User not found")
-            cb({})
+        if(err){
+            console.log("User not found\n" + err)
+            cb(false)
         }
         else
         {

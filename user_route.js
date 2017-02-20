@@ -8,6 +8,7 @@ router.use(utils.isLoggedIn, function(req,res,next) {
   next();
 })
 
+//returns user info
 router.get('/', function(req,res,next){
   User.getDataByMail(req.user.email,function(result){
     res.json(result);
@@ -43,6 +44,7 @@ router.get('/removeAllAddress', function(req,res){
 });
 
 
+//work this out
 router.get('/getinfo', function(req,res){
   User.getDataByMail(req.user.email,function(result){
     Cart.getItems(result._id,function(resp){
@@ -52,8 +54,6 @@ router.get('/getinfo', function(req,res){
     })
   })
 });
-
-
 
 //testing Function
 router.get('/ping', function(req, res){
