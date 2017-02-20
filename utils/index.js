@@ -8,5 +8,17 @@ isLoggedIn: function(req, res, next) {
 
     // if they aren't redirect them to the home page
     res.redirect('/authenticate');
+    },
+vendorLoggedIn: function(req, res, next) {
+
+    // if user is authenticated in the session, carry on
+    if (req.user){
+        if(!req.user.id)
+            {return next();
+        }
+    }
+
+    // if they aren't redirect them to the home page
+    res.redirect('/authenticate');
     }
 }
