@@ -1,10 +1,10 @@
 var express = require('express')
 var router = express.Router()
-var utils = require('./utils')
-var Cart = require('./models/Cart');
-var User = require('./models/User');
-var Item = require('./models/Items');
-var storage = require('./config.json').photoStore;
+var utils = require('../utils')
+var Cart = require('../models/Cart');
+var User = require('../models/User');
+var Item = require('../models/Items');
+var storage = require('../config.json').photoStore;
 
 router.use(function(req,res,next) {
   next();

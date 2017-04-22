@@ -1,8 +1,8 @@
 var express = require('express')
 var router = express.Router()
-var utils = require('./utils')
+var utils = require('../utils')
 var passport = require('passport');
-var vendor = require('./models/Vendor')
+var vendor = require('../models/Vendor')
 
 //always called for vendor calls
 router.use(function(req,res,next) {

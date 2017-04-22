@@ -8,10 +8,10 @@ var morgan = require('morgan');
 var config = require('./config.json');
 
 //routes for the app
-var userRoutes = require('./user_route')
-var cartRoutes = require('./cart_route')
-var itemRoutes = require('./item_route')
-var vendorRoutes = require('./vendor_route')
+var userRoutes = require('./routes/user_route')
+var cartRoutes = require('./routes/cart_route')
+var itemRoutes = require('./routes/item_route')
+var vendorRoutes = require('./routes/vendor_route')
 
 var express = require('express');
 var fileUpload = require('express-fileupload');

@@ -83,7 +83,7 @@ Cart.setItem = function(id,item_id,count,cb) {
 Cart.getItems = function(id,cb){
     Cart.findById(id, function(err,result){
         cb(result)
-    }).populate("items._id")
+    }).populate("_id")
 }
 
 //empty's Full Cart

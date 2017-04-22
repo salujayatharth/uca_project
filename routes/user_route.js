@@ -1,8 +1,8 @@
 var express = require('express')
 var router = express.Router()
-var utils = require('./utils')
-var User = require('./models/User');
-var Cart = require('./models/Cart');
+var utils = require('../utils')
+var User = require('../models/User');
+var Cart = require('../models/Cart');
 
 router.use(utils.isLoggedIn, function(req,res,next) {
   next();
